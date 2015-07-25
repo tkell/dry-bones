@@ -21,6 +21,8 @@ var controllerOptions = {enableGestures: true};
 // let's set up two web audio synths
 var context = new AudioContext();
 var synths = [null, null, null, null, null];
+var octaveLength = 130;
+var rootNote = 256;
 
 var addOrUpdateSynth = function(index, hz) {
   if (synths[index] == null) {
@@ -67,11 +69,24 @@ Leap.loop(controllerOptions, function(frame) {
   // Display Pointable (finger and tool) object data
   var pointableOutput = document.getElementById("pointableData");
   var pointableString = "";
+
+  var rootX = 0;
   if (frame.pointables.length > 0) {
     for (var i = 0; i < frame.pointables.length; i++) {
       var pointable = frame.pointables[i];
       if (pointable.extended) {
-        addOrUpdateSynth(i, (i+1) * 220);
+        if (rootX == 0) {
+          rootX = pointable.tipPosition[0];
+          addOrUpdateSynth(i, rootNote);
+          console.log(rootNote)
+        } else {
+          var x = pointable.tipPosition[0];
+          var deltaX = Math.abs(rootX - x);
+          var note = (deltaX / octaveLength) * rootNote
+          addOrUpdateSynth(i, note);
+          console.log(note)
+        }
+
       } else {
         removeSynth(i);
       }
