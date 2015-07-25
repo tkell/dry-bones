@@ -20,16 +20,35 @@ var controllerOptions = {enableGestures: true};
 
 // let's set up two web audio synths
 var context = new AudioContext();
-var synths = [];
+var synths = [null, null, null, null, null];
 
-var addSynth = function() {
-  var osc = context.createOscillator();
-  osc.frequency.value = 440;
-  osc.connect(context.destination);
-  synths.push(osc);
-  osc.start()
+var addOrUpdateSynth = function(index, hz) {
+  if (synths[index] == null) {
+    var osc = context.createOscillator();
+    osc.connect(context.destination);
+    osc.frequency.value = hz;
+    synths[index] = osc;
+    synths[index].start(); 
+  } else {
+    synths[index].frequency.value = hz;
+  }
 }
 
+var removeSynth = function(index) {
+  if (synths[index] != null) {
+    console.log("stopping", index);
+    console.log(synths);
+    console.log(synths[index]);
+    synths[index].stop();
+    synths[index] = null;
+  }
+}
+
+var resetSynths = function() {
+  for (var i = 0; i < synths.length; i++) {
+    removeSynth(i);
+  }
+}
 
 
 Leap.loop(controllerOptions, function(frame) {
@@ -49,26 +68,22 @@ Leap.loop(controllerOptions, function(frame) {
   var pointableOutput = document.getElementById("pointableData");
   var pointableString = "";
   if (frame.pointables.length > 0) {
-    if (synths.length == 0) {
-      addSynth();
-    }
-
-    var fingerTypeMap = ["Thumb", "Index finger", "Middle finger", "Ring finger", "Pinky finger"];
     for (var i = 0; i < frame.pointables.length; i++) {
       var pointable = frame.pointables[i];
-
+      if (pointable.extended) {
+        addOrUpdateSynth(i, (i+1) * 220);
+      } else {
+        removeSynth(i);
+      }
       pointableString += "<div style='width:250px; float:left; padding:5px'>";
-      pointableString += "Pointable ID: " + pointable.id + "<br />";
-      pointableString += "Classified as a finger<br />";
       pointableString += "Extended?: "  + pointable.extended + "<br />";
       pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />";
       pointableString += "</div>";
     }
   }
   else {
-    if (synths.length == 1) {
-      synths[0].stop();
-      synths = [];
+    if (synths != [null, null, null, null, null]) {
+      resetSynths();
     }
     pointableString += "<div>No pointables</div>";
   }
