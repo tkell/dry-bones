@@ -1,5 +1,20 @@
 body {
 	background-image: url("bones.jpg");
 	background-size: cover;
+	font-family: Baskerville, 'Baskerville Old Face', 'Hoefler Text', Garamond, 'Times New Roman', serif;
+	color: #FFFFFF;
+	text-align: center;
 }
+
+h1 {
+	font-size: 800%;
+	margin-bottom: 0px;
+}
+
+.main {
+	font-size: 300%;
+}
+
+
+
 

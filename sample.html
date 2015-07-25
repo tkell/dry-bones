@@ -66,7 +66,7 @@ Leap.loop(controllerOptions, function(frame) {
   var frameOutput = document.getElementById("frameData");
   var frameString = frame.id  + "<br />"
                   + frame.timestamp + "&micro;s<br />"
-  frameOutput.innerHTML = "<div class='frame-data'>" + frameString + "</div>";
+  frameOutput.innerHTML = "<div>" + frameString + "</div>";
 
   // Display Pointable (finger and tool) object data
   var pointableOutput = document.getElementById("pointableData");
@@ -99,13 +99,13 @@ Leap.loop(controllerOptions, function(frame) {
           var note = rootNote + ((deltaX / octaveLength) * (2 * rootNote)); // two octave range
           addOrUpdateSynth(i, note, gain);
         }
+        pointableString += "<div>";
+        pointableString += vectorToString(pointable.tipPosition) + "<br />";
+        pointableString += "</div>";
 
       } else {
         removeSynth(i);
       }
-      pointableString += "<div class='finger-data'>";
-      pointableString += vectorToString(pointable.tipPosition) + "<br />";
-      pointableString += "</div>";
     }
   }
   else {
@@ -143,7 +143,7 @@ function togglePause() {
 
 <body>
 <h1>dry bones</h1>
-<div id="main">
+<div class="main">
   <div id="frameData"></div>
   <div style="clear:both;"></div>
   <div id="pointableData"></div>
