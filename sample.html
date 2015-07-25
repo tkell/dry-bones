@@ -1,30 +1,11 @@
 <!DOCTYPE html>
-<!--
-/------------------------------------------------------------------------------\
-| Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.               |
-| Leap Motion proprietary and confidential. Not for distribution.              |
-| Use subject to the terms of the Leap Motion SDK Agreement available at       |
-| https://developer.leapmotion.com/sdk_agreement, or another agreement         |
-| between Leap Motion and you, your company or other organization.             |
-\------------------------------------------------------------------------------/
--->
-
-<!--
-
-See additional libraries, guides, and examples at:
-
- - https://developer.leapmotion.com/downloads/javascript
- - https://developer.leapmotion.com/getting-started/javascript
- - https://developer.leapmotion.com/gallery/tags/javascript
-
--->
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Leap Motion JavaScript Sample</title>
+<title>dry bones</title>
 <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
 <script>
+
 // Store frame for motion functions
 var previousFrame = null;
 var paused = false;
@@ -51,7 +32,6 @@ var addSynth = function() {
 
 
 
-
 Leap.loop(controllerOptions, function(frame) {
   if (paused) {
     return; // Skip this update
@@ -59,24 +39,9 @@ Leap.loop(controllerOptions, function(frame) {
 
   // Display Frame object data
   var frameOutput = document.getElementById("frameData");
-
   var frameString = "Frame ID: " + frame.id  + "<br />"
                   + "Timestamp: " + frame.timestamp + " &micro;s<br />"
                   + "Fingers: " + frame.fingers.length + "<br />"
-
-  // Frame motion factors
-  if (previousFrame && previousFrame.valid) {
-    var translation = frame.translation(previousFrame);
-    frameString += "Translation: " + vectorToString(translation) + " mm <br />";
-
-    var rotationAxis = frame.rotationAxis(previousFrame);
-    var rotationAngle = frame.rotationAngle(previousFrame);
-    frameString += "Rotation axis: " + vectorToString(rotationAxis, 2) + "<br />";
-    frameString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
-
-    var scaleFactor = frame.scaleFactor(previousFrame);
-    frameString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
-  }
   frameOutput.innerHTML = "<div style='width:300px; float:left; padding:5px'>" + frameString + "</div>";
 
 
@@ -89,39 +54,15 @@ Leap.loop(controllerOptions, function(frame) {
     }
 
     var fingerTypeMap = ["Thumb", "Index finger", "Middle finger", "Ring finger", "Pinky finger"];
-    var boneTypeMap = ["Metacarpal", "Proximal phalanx", "Intermediate phalanx", "Distal phalanx"];
     for (var i = 0; i < frame.pointables.length; i++) {
       var pointable = frame.pointables[i];
 
       pointableString += "<div style='width:250px; float:left; padding:5px'>";
-
-      if (pointable.tool) {
-        pointableString += "Pointable ID: " + pointable.id + "<br />";
-        pointableString += "Classified as a tool <br />";
-        pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
-        pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
-        pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
-        pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />"
-        pointableString += "</div>";
-      }
-      else {
-        pointableString += "Pointable ID: " + pointable.id + "<br />";
-        pointableString += "Type: " + fingerTypeMap[pointable.type] + "<br />";
-        pointableString += "Belongs to hand with ID: " + pointable.handId + "<br />";
-        pointableString += "Classified as a finger<br />";
-        pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
-        pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
-        pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
-        pointableString += "Extended?: "  + pointable.extended + "<br />";
-        pointable.bones.forEach( function(bone){
-          pointableString += boneTypeMap[bone.type] + " bone <br />";
-          pointableString += "Center: " + vectorToString(bone.center()) + "<br />";
-          pointableString += "Direction: " + vectorToString(bone.direction()) + "<br />";
-          pointableString += "Up vector: " + vectorToString(bone.basis[1]) + "<br />";
-        });
-        pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />";
-        pointableString += "</div>";
-      }
+      pointableString += "Pointable ID: " + pointable.id + "<br />";
+      pointableString += "Classified as a finger<br />";
+      pointableString += "Extended?: "  + pointable.extended + "<br />";
+      pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />";
+      pointableString += "</div>";
     }
   }
   else {
@@ -156,32 +97,18 @@ function togglePause() {
   }
 }
 
-function pauseForGestures() {
-  if (document.getElementById("pauseOnGesture").checked) {
-    pauseOnGesture = true;
-  } else {
-    pauseOnGesture = false;
-  }
-}
-
 </script>
 </head>
 <body>
-<h1>Leap Motion JavaScript Sample</h1>
+<h1>dry bones</h1>
 <div id="main">
   <button id="pause" onclick="togglePause()">Pause</button>
-  <input type="checkbox" id="pauseOnGesture" onclick="pauseForGestures()">Pause on gesture</input>
   <h3>Frame data:</h3>
   <div id="frameData"></div>
-  <div style="clear:both;"></div>
-  <h3>Hand data:</h3>
-  <div id="handData"></div>
   <div style="clear:both;"></div>
   <h3>Finger and tool data:</h3>
   <div id="pointableData"></div>
   <div style="clear:both;"></div>
-  <h3>Gesture data:</h3>
-  <div id="gestureData"></div>
 </div>
 </body>
 </html>
