@@ -24,24 +24,26 @@ var synths = [null, null, null, null, null];
 var octaveLength = 130;
 var rootNote = 128;
 
-var addOrUpdateSynth = function(index, hz) {
+var addOrUpdateSynth = function(index, hz, gain) {
   if (synths[index] == null) {
     var osc = context.createOscillator();
-    osc.connect(context.destination);
+    var gainNode = context.createGain();
+    gainNode.gain.value = gain;
     osc.frequency.value = hz;
-    synths[index] = osc;
-    synths[index].start(); 
+    osc.connect(gainNode);
+    gainNode.connect(context.destination);
+    var synthChain = {osc: osc, gainNode: gainNode}
+    synths[index] = synthChain;
+    synths[index].osc.start(); 
   } else {
-    synths[index].frequency.value = hz;
+    synths[index].osc.frequency.value = hz;
+    synths[index].gainNode.gain.value = gain;
   }
 }
 
 var removeSynth = function(index) {
   if (synths[index] != null) {
-    console.log("stopping", index);
-    console.log(synths);
-    console.log(synths[index]);
-    synths[index].stop();
+    synths[index].osc.stop();
     synths[index] = null;
   }
 }
@@ -75,16 +77,27 @@ Leap.loop(controllerOptions, function(frame) {
     for (var i = 0; i < frame.pointables.length; i++) {
       var pointable = frame.pointables[i];
       if (pointable.extended) {
+
+        var gain = (pointable.tipPosition[1] - 100) / (400 - 100);
+        gain =  Math.abs(1.0 - gain);
+        
+        if (gain > 1.0) {
+          gain = 1.0;
+        }
+
+        if (gain < 0.0) {
+          gain = 0.0;
+        }
+        console.log(gain);
+
         if (rootX == 0) {
           rootX = pointable.tipPosition[0];
-          addOrUpdateSynth(i, rootNote);
-          console.log(rootNote)
+          addOrUpdateSynth(i, rootNote, gain);
         } else {
           var x = pointable.tipPosition[0];
           var deltaX = Math.abs(rootX - x);
           var note = rootNote + ((deltaX / octaveLength) * (2 * rootNote)); // two octave range
-          addOrUpdateSynth(i, note);
-          console.log(note)
+          addOrUpdateSynth(i, note, gain);
         }
 
       } else {
