@@ -22,7 +22,7 @@ var controllerOptions = {enableGestures: true};
 var context = new AudioContext();
 var synths = [null, null, null, null, null];
 var octaveLength = 130;
-var rootNote = 256;
+var rootNote = 128;
 
 var addOrUpdateSynth = function(index, hz) {
   if (synths[index] == null) {
@@ -82,7 +82,7 @@ Leap.loop(controllerOptions, function(frame) {
         } else {
           var x = pointable.tipPosition[0];
           var deltaX = Math.abs(rootX - x);
-          var note = (deltaX / octaveLength) * rootNote
+          var note = rootNote + ((deltaX / octaveLength) * (2 * rootNote)); // two octave range
           addOrUpdateSynth(i, note);
           console.log(note)
         }
